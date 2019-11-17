@@ -18,6 +18,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -39,6 +40,10 @@ public class MainActivity extends AppCompatActivity {
     private boolean isScanning = false;
     public static final int REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS = 1;
 
+    private TextView tvUUID;
+    private TextView tvMajor;
+    private TextView tvMinor;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,6 +56,11 @@ public class MainActivity extends AppCompatActivity {
             // Marshmallow+ Permission APIs
             handleMarshawll();
         }
+
+        tvUUID = findViewById(R.id.tvUUID);
+        tvMajor = findViewById(R.id.tvMajor);
+        tvMinor = findViewById(R.id.tvMinor);
+
         scanHandler.post(scanRunnable);
     }
 
@@ -74,13 +84,13 @@ public class MainActivity extends AppCompatActivity {
                     // All Permissions Granted
 
                     // Permission Denied
-                    Toast.makeText(MainActivity.this, "All Permission GRANTED !! Thank You :)", Toast.LENGTH_SHORT)
+                    Toast.makeText(MainActivity.this, "All Bluetooth Permissions granted", Toast.LENGTH_SHORT)
                             .show();
 
 
                 } else {
                     // Permission Denied
-                    Toast.makeText(MainActivity.this, "One or More Permissions are DENIED Exiting App :(", Toast.LENGTH_SHORT)
+                    Toast.makeText(MainActivity.this, "One or More Permissions are DENIED Exiting App", Toast.LENGTH_SHORT)
                             .show();
 
                     finish();
@@ -126,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        Toast.makeText(MainActivity.this, "No new Permission Required- Launching App .You are Awesome!!", Toast.LENGTH_SHORT)
+        Toast.makeText(MainActivity.this, "No new Permission Required", Toast.LENGTH_SHORT)
                 .show();
     }
 
@@ -150,10 +160,6 @@ public class MainActivity extends AppCompatActivity {
         }
         return true;
     }
-
-    // ------------------------------------------------------------------------
-    // public usage
-    // ------------------------------------------------------------------------
 
     private Runnable scanRunnable = new Runnable()
     {
@@ -219,9 +225,15 @@ public class MainActivity extends AppCompatActivity {
                 // minor
                 final int minor = (scanRecord[startByte + 22] & 0xff) * 0x100 + (scanRecord[startByte + 23] & 0xff);
 
+                Log.d ("Distancee", "" + calculateDistance(4, rssi));
+
+
+                tvUUID.setText(uuid);
+                tvMajor.setText(Integer.toString(major));
+                tvMinor.setText(Integer.toString(minor));
+
                 Log.i(LOG_TAG,"UUID: " +uuid + "\\nmajor: " +major +"\\nminor" +minor);
             }
-
         }
     };
 
@@ -240,15 +252,6 @@ public class MainActivity extends AppCompatActivity {
         }
         return new String(hexChars);
     }
-
-    protected ScanCallback mScanCallback = new ScanCallback() {
-        @Override
-        public void onScanResult(int callbackType, ScanResult result) {
-            ScanRecord mScanRecord = result.getScanRecord();
-            byte[] manufacturerData = mScanRecord.getManufacturerSpecificData(224);
-            int mRssi = result.getRssi();
-        }
-    };
 
     public double calculateDistance(int txPower, double rssi) {
         if (rssi == 0) {
