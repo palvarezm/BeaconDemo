@@ -27,18 +27,16 @@ import java.util.List;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
-// ------------------------------------------------------------------------
-    // members
-    // ------------------------------------------------------------------------
 
     private static final String LOG_TAG = "MainActivity";
+
+    public static final int REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS = 1;
 
     private BluetoothManager btManager;
     private BluetoothAdapter btAdapter;
     private Handler scanHandler = new Handler();
     private int scan_interval_ms = 5000;
     private boolean isScanning = false;
-    public static final int REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS = 1;
 
     private TextView tvUUID;
     private TextView tvMajor;
@@ -101,7 +99,6 @@ public class MainActivity extends AppCompatActivity {
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
-
 
     @TargetApi(Build.VERSION_CODES.M)
     private void handleMarshawll() {
@@ -227,10 +224,9 @@ public class MainActivity extends AppCompatActivity {
 
                 Log.d ("Distancee", "" + calculateDistance(4, rssi));
 
-
-                tvUUID.setText(uuid);
-                tvMajor.setText(Integer.toString(major));
-                tvMinor.setText(Integer.toString(minor));
+                tvUUID.setText("UUID: " + uuid);
+                tvMajor.setText("Major: " + major);
+                tvMinor.setText("Minor :" + minor);
 
                 Log.i(LOG_TAG,"UUID: " +uuid + "\\nmajor: " +major +"\\nminor" +minor);
             }
@@ -257,7 +253,8 @@ public class MainActivity extends AppCompatActivity {
         if (rssi == 0) {
             return -1.0; // if we cannot determine accuracy, return -1.
         }
-        double ratio = rssi*1.0/txPower;
+        //double ratio = rssi*1.0/txPower;
+        double ratio = (txPower - rssi)/(10*3);
         if (ratio < 1.0) {
             return Math.pow(ratio,10);
         }
